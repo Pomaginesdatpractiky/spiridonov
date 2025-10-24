@@ -1,0 +1,167 @@
+#include <iostream>
+#include <vector> // Для использования std::vector
+#include <stdexcept> // Для исключений (ошибок)
+
+using namespace std;
+
+class FactorialCalculator {
+private:
+    // Поля (данные)
+    unsigned long long lastResult; // Последний вычисленный результат
+    vector<unsigned long long> allResults; // Вектор для хранения всех результатов
+
+public:
+    // Конструктор по умолчанию
+    FactorialCalculator() : lastResult(1) { // Факториал 0 и 1 по умолчанию
+        allResults.push_back(1); // Добавляем факториал 0 (0! = 1) в историю
+    }
+
+    // Метод для вычисления факториала одного числа n
+    unsigned long long calculate(int n) {
+        // Проверка на отрицательное число
+        if (n < 0) {
+            throw invalid_argument("Факториал отрицательного числа не определен.");
+        }
+
+        // Факториал 0 и 1 равен 1
+        if (n == 0 || n == 1) {
+            lastResult = 1;
+            allResults.push_back(lastResult);
+            return lastResult;
+        }
+
+        // Вычисляем факториал для n >= 2
+        unsigned long long result = 1;
+        for (int i = 2; i <= n; ++i) {
+            // Проверка на переполнение (очень грубая, но для примера сгодится)
+            if (result > ULLONG_MAX / i) {
+                throw overflow_error("Произошло переполнение при вычислении факториала.");
+            }
+            result *= i;
+        }
+
+        lastResult = result;
+        allResults.push_back(lastResult); // Добавляем результат в историю
+        return lastResult;
+    }
+
+    // Метод для вычисления факториалов в диапазоне [start, end]
+    void calculateRange(int start, int end) {
+        // Проверка корректности диапазона
+        if (start < 0 || end < 0) {
+            throw invalid_argument("Диапазон не может содержать отрицательные числа.");
+        }
+        if (start > end) {
+            throw invalid_argument("Начало диапазона не может быть больше конца.");
+        }
+
+        cout << "Вычисление факториалов от " << start << " до " << end << ":" << endl;
+        for (int i = start; i <= end; ++i) {
+            try {
+                unsigned long long fact = calculate(i); // Используем уже написанный метод
+                cout << i << "! = " << fact << endl;
+            }
+            catch (const exception& e) {
+                cout << "Ошибка для " << i << "!: " << e.what() << endl;
+                // Можно break; чтобы прервать цикл при первой же ошибке
+            }
+        }
+    }
+
+    // Геттер для последнего результата
+    unsigned long long getLastResult() const {
+        return lastResult;
+    }
+
+    // Метод для получения всех результатов
+    void getAllResults() const {
+        if (allResults.empty()) {
+            cout << "История результатов пуста." << endl;
+            return;
+        }
+        cout << "Все вычисленные факториалы: ";
+        // Выводим историю. Первый элемент - это 0! из конструктора.
+        // i - это число, fact - его факториал.
+        // Мы начали с 0! (индекс 0 в векторе), затем 0!, потом 1!, 2! и т.д.
+        // Чтобы было понятнее, выведем пары "число: факториал"
+        // Для этого нам нужно отслеживать, для какого числа был вычислен факториал.
+        // Это сложно, т.к. calculateRange вызывает calculate много раз.
+        // Упростим: просто выведем значения в векторе.
+        for (size_t i = 0; i < allResults.size(); ++i) {
+            cout << allResults[i];
+            if (i != allResults.size() - 1) {
+                cout << ", ";
+            }
+        }
+        cout << endl;
+    }
+
+    // Метод для очистки истории результатов (опционально, но полезно)
+    void reset() {
+        allResults.clear();
+        allResults.push_back(1); // Снова добавляем факториал 0
+        lastResult = 1;
+        cout << "История результатов очищена." << endl;
+    }
+};
+
+// Главная функция программы
+int main() {
+    setlocale(LC_ALL, "rus"); // Для корректного отображения русского языка в консоли Windows
+
+    cout << "=== Демонстрация работы класса FactorialCalculator ===" << endl;
+
+    // 1. Создаем объект нашего класса
+    FactorialCalculator calc;
+    // 2. Вычисляем факториал одного числа
+    cout << "\n--- Тест 1: Вычисление одиночного факториала ---" << endl;
+    try {
+        int num = 5;
+        unsigned long long result = calc.calculate(num);
+        cout << "Факториал " << num << "! = " << result << endl;
+    }
+    catch (const exception& e) {
+        cerr << "Ошибка: " << e.what() << endl;
+    }
+
+    // 3. Получаем последний результат
+    cout << "\n--- Тест 2: Получение последнего результата ---" << endl;
+    cout << "Последний вычисленный факториал: " << calc.getLastResult() << endl;
+
+    // 4. Вычисляем диапазон факториалов
+    cout << "\n--- Тест 3: Вычисление диапазона факториалов ---" << endl;
+    try {
+        calc.calculateRange(1, 7);
+    }
+    catch (const exception& e) {
+        cerr << "Ошибка: " << e.what() << endl;
+    }
+
+    // 5. Смотрим всю историю вычислений
+    cout << "\n--- Тест 4: Просмотр всей истории ---" << endl;
+    calc.getAllResults();
+
+    // 6. (Опционально) Проверка обработки ошибок
+    cout << "\n--- Тест 5: Проверка обработки ошибок ---" << endl;
+    try {
+        calc.calculate(-5); // Отрицательное число
+    }
+    catch (const exception& e) {
+        cerr << "Ошибка: " << e.what() << endl;
+    }
+
+    try {
+        calc.calculateRange(10, 5); // Неправильный диапазон
+    }
+    catch (const exception& e) {
+        cerr << "Ошибка: " << e.what() << endl;
+    }
+
+    // 7. Демонстрация очистки истории
+    cout << "\n--- Тест 6: Очистка истории ---" << endl;
+    calc.reset();
+    calc.getAllResults();
+
+    cout << "\nПрограмма завершена." << endl;
+    return 0;
+}
