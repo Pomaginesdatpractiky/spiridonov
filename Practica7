@@ -1,0 +1,91 @@
+
+using System;
+using System.Windows.Forms;
+
+namespace RacesGame
+{
+    public partial class Form1 : Form
+    {
+        Random r = new Random(); // Генератор случайных чисел для всех таймеров
+
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        // Событие при клике на первую машинку
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+            label4.Text = "Вы поставили на машинку 1";
+            timer1.Start();
+            timer2.Start();
+            timer3.Start();
+        }
+
+        // Событие при клике на вторую машинку
+        private void pictureBox2_Click(object sender, EventArgs e)
+        {
+            label4.Text = "Вы поставили на машинку 2";
+            timer1.Start();
+            timer2.Start();
+            timer3.Start();
+        }
+
+        // Событие при клике на третью машинку
+        private void pictureBox3_Click(object sender, EventArgs e)
+        {
+            label4.Text = "Вы поставили на машинку 3";
+            timer1.Start();
+            timer2.Start();
+            timer3.Start();
+        }
+
+        // Таймер для первой машинки
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            pictureBox1.Top -= 2; // Двигаем машинку вверх
+            timer1.Interval = r.Next(1, 150); // Случайная скорость
+
+            // Проверяем, достигла ли машинка верха
+            if (pictureBox1.Top < 50)
+            {
+                timer1.Stop();
+                timer2.Stop();
+                timer3.Stop();
+                label4.Text = "Победила машинка номер 1!";
+            }
+        }
+
+        // Таймер для второй машинки
+        private void timer2_Tick(object sender, EventArgs e)
+        {
+            pictureBox2.Top -= 2; // Двигаем машинку вверх
+            timer2.Interval = r.Next(1, 150); // Случайная скорость
+
+            // Проверяем, достигла ли машинка верха
+            if (pictureBox2.Top < 50)
+            {
+                timer1.Stop();
+                timer2.Stop();
+                timer3.Stop();
+                label4.Text = "Победила машинка номер 2!";
+            }
+        }
+
+        // Таймер для третьей машинки
+        private void timer3_Tick(object sender, EventArgs e)
+        {
+            pictureBox3.Top -= 2; // Двигаем машинку вверх
+            timer3.Interval = r.Next(1, 150); // Случайная скорость
+
+            // Проверяем, достигла ли машинка верха
+            if (pictureBox3.Top < 50)
+            {
+                timer1.Stop();
+                timer2.Stop();
+                timer3.Stop();
+                label4.Text = "Победила машинка номер 3!";
+            }
+        }
+    }
+}
