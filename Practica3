@@ -1,0 +1,33 @@
+#include <iostream>
+#include <cmath>
+
+using namespace std;
+
+/// <summary>
+/// Вычисляет время, необходимое для преодоления расстояния с заданной скоростью.
+/// </summary>
+/// <param name="distance">Расстояние, которое нужно преодолеть (в километрах).</param>
+/// <param name="speed">Скорость движения (в километрах в час).</param>
+/// <returns>Время в пути (в часах).</returns>
+/// <remarks>Если скорость равна или меньше нуля, возвращает -1.</remarks>
+double calculateTravelTime(double distance, double speed)
+{
+    if (speed <= 0)
+    {
+        return -1; // Невозможно двигаться с неположительной скоростью
+    }
+    return distance / speed;
+}
+
+int main()
+{
+    // Здесь будет видна подсказка с комментарием
+    double time = calculateTravelTime(150, 80);
+    cout << "Время в пути: " << time << " часа(ов)" << endl;
+    return 0;
+}
+// БЫЛО:
+cout; << "Время в пути: " << time << " часа(ов)" << endl;
+
+// СТАЛО:
+std::cout; << "Время в пути: " << time << " часа(ов)" << std::endl;
