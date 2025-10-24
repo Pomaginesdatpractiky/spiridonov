@@ -1,0 +1,175 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <windows.h>
+
+using namespace std;
+
+// ===== ФУНКЦИЯ 1: Работа с праздником =====
+string handleHoliday() {
+    string holiday;
+
+    // Проверяем, есть ли сохраненный праздник
+    ifstream fin("holiday_settings.txt");
+    if (fin.is_open()) {
+        getline(fin, holiday);
+        fin.close();
+
+        cout << "Текущий любимый праздник: " << holiday << endl;
+
+        char choice;
+        cout << "Хотите изменить праздник? (y/n): ";
+        cin >> choice;
+
+        if (choice == 'y' || choice == 'Y') {
+            cout << "Введите новый любимый праздник: ";
+            cin.ignore();
+            getline(cin, holiday);
+
+            // Сохраняем новый праздник
+            ofstream fout("holiday_settings.txt");
+            fout << holiday;
+            fout.close();
+
+            cout << "Праздник обновлен!" << endl;
+        }
+    }
+    else {
+        // Первый ввод праздника
+        cout << "Введите ваш любимый праздник: ";
+        cin.ignore();
+        getline(cin, holiday);
+
+        // Сохраняем праздник
+        ofstream fout("holiday_settings.txt");
+        fout << holiday;
+        fout.close();
+
+        cout << "Праздник сохранен!" << endl;
+    }
+
+    return holiday;
+}
+
+// ===== ФУНКЦИЯ 2: Работа с цветом фона =====
+void handleBackgroundColor() {
+    int bgColor;
+
+    // Проверяем, есть ли сохраненный цвет
+    ifstream fin("color_settings.txt");
+    if (fin.is_open()) {
+        fin >> bgColor;
+        fin.close();
+
+        // Устанавливаем сохраненный цвет
+        string command = "color ";
+        command += to_string(bgColor) + "7"; // фон + белый текст
+        system(command.c_str());
+
+        cout << "Текущий цвет фона: " << bgColor << endl;
+
+        char choice;
+        cout << "Хотите изменить цвет фона? (y/n): ";
+        cin >> choice;
+
+        if (choice == 'y' || choice == 'Y') {
+            cout << "Доступные цвета фона:" << endl;
+            cout << "0 - Черный\n1 - Синий\n2 - Зеленый\n3 - Голубой\n";
+            cout << "4 - Красный\n5 - Фиолетовый\n6 - Желтый\n7 - Белый" << endl;
+
+            // Проверка корректного ввода
+            while (true) {
+                cout << "Выберите цвет фона (0-7): ";
+                cin >> bgColor;
+
+                if (cin.fail() || bgColor < 0 || bgColor > 7) {
+                    cin.clear();
+                    cin.ignore(10000, '\n');
+                    cout << "Ошибка! Введите число от 0 до 7!" << endl;
+                }
+                else {
+                    break;
+                }
+            }
+
+            // Сохраняем новый цвет
+            ofstream fout("color_settings.txt");
+            fout << bgColor;
+            fout.close();
+
+            // Применяем новый цвет
+            string newCommand = "color ";
+            newCommand += to_string(bgColor) + "7";
+            system(newCommand.c_str());
+
+            cout << "Цвет фона обновлен!" << endl;
+        }
+    }
+    else {
+        // Первый ввод цвета
+        cout << "Доступные цвета фона:" << endl;
+        cout << "0 - Черный\n1 - Синий\n2 - Зеленый\n3 - Голубой\n";
+        cout << "4 - Красный\n5 - Фиолетовый\n6 - Желтый\n7 - Белый" << endl;
+
+        // Проверка корректного ввода
+        while (true) {
+            cout << "Выберите цвет фона (0-7): ";
+            cin >> bgColor;
+
+            if (cin.fail() || bgColor < 0 || bgColor > 7) {
+                cin.clear();
+                cin.ignore(10000, '\n');
+                cout << "Ошибка! Введите число от 0 до 7!" << endl;
+            }
+            else {
+                break;
+            }
+        }
+
+        // Сохраняем цвет
+        ofstream fout("color_settings.txt");
+        fout << bgColor;
+        fout.close();
+
+        // Применяем цвет
+        string command = "color ";
+        command += to_string(bgColor) + "7";
+        system(command.c_str());
+
+        cout << "Цвет фона сохранен!" << endl;
+    }
+}
+// ===== ГЛАВНАЯ ФУНКЦИЯ =====
+int main() {
+    setlocale(0, "ru");
+    SetConsoleCP(1251);
+    SetConsoleOutputCP(1251);
+
+    cout << "=== ПРОГРАММА ДЛЯ СОХРАНЕНИЯ ПРАЗДНИКА И ЦВЕТА ФОНА ===" << endl;
+    cout << endl;
+
+    // Вызываем функцию для работы с праздником
+    string holiday = handleHoliday();
+
+    cout << endl;
+
+    // Вызываем функцию для работы с цветом фона
+    handleBackgroundColor();
+
+    cout << endl;
+    cout << "=== ИТОГОВЫЕ НАСТРОЙКИ ===" << endl;
+    cout << "Любимый праздник: " << holiday << endl;
+
+    // Читаем текущий цвет для отображения
+    ifstream fin("color_settings.txt");
+    int currentColor;
+    if (fin.is_open()) {
+        fin >> currentColor;
+        fin.close();
+        cout << "Цвет фона: " << currentColor << endl;
+    }
+
+    cout << endl;
+    system("pause");
+    return 0;
+}
